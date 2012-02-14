@@ -593,12 +593,12 @@ FUNCTION {article}
     { journal field.or.null emphasize
       format.vol.num.pages 
       format.date empty$
-	'skip$
-	{ duplicate$ empty$
-	    { pop$ format.date paren }
-        { " " * format.date paren * }
-	  if$
-	}
+	    'skip$
+	    { duplicate$ empty$
+	        { pop$ format.date paren }
+            { " " * format.date paren * }
+	      if$
+	    }
       if$
       output
     }
