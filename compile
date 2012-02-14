@@ -1,0 +1,8 @@
+#!/bin/sh
+
+latex main.tex
+bibtex main.aux
+latex main.tex
+latex main.tex
+dvips -Ppdf main.dvi
+ps2pdf main.ps main.pdf
