@@ -1,9 +1,18 @@
-%% #define AIP 1		% Fri Jun 15 10:51:17 1990
+%% #define NSE 1		% Fri Jun 15 10:51:17 1990
 %% #include "TEX$ROOT:[BIBTEX]PHYSICS.BTX"
 	% Please notify Charles Karney (Karney@Princeton.EDU)
 	% of any bugs, improvements, etc.
 
-	% For American Institute of Physics Journals
+	% For Nuclear Science and Engineering
+    % Changes made by Paul K. Romano to match style for Nucl. Sci. Eng.
+    % Sep. 19, 2010
+    %   - Added FUNCTION quote and used on format.title
+    %   - In FUNCTION article, added title
+    %   - Emphasized journal name in FUNCTION article
+    %   - changed FUNCTION format.names to make author names all caps
+    % Feb. 13, 2012
+    %   - Removed "Technical Report" prefix
+    %   - Year for technical report in parentheses
 
 	% version 0.99b for BibTeX versions 0.99a or later, LaTeX version 2.09.
 	% Copyright (C) 1985, all rights reserved.
@@ -13,13 +22,6 @@
 	% btxbst.doc, plain.bst, unsrt.bst, alpha.bst, and abbrv.bst.
 	% This restriction helps ensure that all standard styles are identical.
 	% The file btxbst.doc has the documentation for this style.
-
-    % Changes made by Paul K. Romano to match style for Nucl. Sci. Eng.
-    % on Sep. 19, 2010
-    %   - Added FUNCTION quote and used on format.title
-    %   - In FUNCTION article, added title
-    %   - Emphasized journal name in FUNCTION article
-    %   - changed FUNCTION format.names to make author names all caps
 
 ENTRY
   { address
@@ -490,7 +492,7 @@ FUNCTION {format.thesis.type}
 
 FUNCTION {format.tr.number}
 { type empty$
-    { "Technical Report" }
+    { "" }
     'type
   if$
   number empty$
@@ -594,7 +596,7 @@ FUNCTION {article}
 	'skip$
 	{ duplicate$ empty$
 	    { pop$ format.date paren }
-            { " " * format.date paren * }
+        { " " * format.date paren * }
 	  if$
 	}
       if$
@@ -873,7 +875,7 @@ FUNCTION {techreport}
   format.tr.number output.nonnull
   institution "institution" output.check
   address output
-  format.date "year" output.check
+  " " * format.date paren * "year" output.check
   new.block
   note output
   fin.entry
