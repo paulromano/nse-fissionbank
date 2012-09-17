@@ -1,8 +1,8 @@
 #!/bin/sh
 
-latex main.tex
-bibtex main.aux
-latex main.tex
-latex main.tex
-dvips -Ppdf main.dvi
-ps2pdf main.ps main.pdf
+latex nse-fissionbank.tex
+bibtex nse-fissionbank.aux
+latex nse-fissionbank.tex
+latex nse-fissionbank.tex
+dvips -Ppdf nse-fissionbank.dvi
+ps2pdf nse-fissionbank.ps nse-fissionbank.pdf
