@@ -13,6 +13,8 @@
     % Feb. 13, 2012
     %   - Removed "Technical Report" prefix
     %   - Year for technical report in parentheses
+    % Jun. 29, 2012
+    %   - Changed format.title to preserve capitalization
 
     % version 0.99b for BibTeX versions 0.99a or later, LaTeX version 2.09.
     % Copyright (C) 1985, all rights reserved.
@@ -244,6 +246,47 @@ FUNCTION {init.state.consts}
   #3 'after.block :=
 }
 
+% These three functions pop one or two (integer) arguments from the stack
+% and push a single one, either 0 or 1.
+% The 'skip$ in the `and' and `or' functions are used because
+% the corresponding if$ would be idempotent
+
+FUNCTION {not}
+{   { #0 }
+    { #1 }
+  if$
+}
+
+FUNCTION {and}
+{   'skip$
+    { pop$ #0 }
+  if$
+}
+
+FUNCTION {or}
+{   { pop$ #1 }
+    'skip$
+  if$
+}
+
+% Count the real number of characters in a string
+
+INTEGERS { l }
+FUNCTION {string.length} {
+  #1 'l :=
+  { duplicate$ l #1 substring$ "" = not }
+  { l #1 + 'l := }
+  while$
+  pop$
+  l #1 -
+}
+
+% Checks if the variable on top of the stack ends with a quote. If so, it adds
+% #1 on top of the stack, otherwise, it adds #0.
+
+FUNCTION {ends.with.quote}
+{ duplicate$ duplicate$ string.length #1 - #2 substring$ "''" = }
+
 % the variables s and t are temporary string holders
 
 STRINGS { s t }
@@ -251,17 +294,24 @@ STRINGS { s t }
 FUNCTION {output.nonnull}
 { 's :=
   output.state mid.sentence =
-    { ", " * write$ }
-    { output.state after.block =
-    { "," * write$
-      newline$
-      "\newblock " write$
-    }
-    { output.state before.all =
-        'write$
-        { add.period$ " " * write$ }
+    { ends.with.quote
+        { " "  * write$ }
+        { ", " * write$ }
       if$
     }
+    { output.state after.block =
+        { ends.with.quote
+            { write$ }
+            { "," * write$ }
+          if$
+          newline$
+          "\newblock " write$
+        }
+        { output.state before.all =
+            'write$
+            { add.period$ " " * write$ }
+          if$
+        }
       if$
       mid.sentence 'output.state :=
     }
@@ -311,29 +361,6 @@ FUNCTION {new.block}
 
 FUNCTION {new.sentence}
 { skip$
-}
-
-% These three functions pop one or two (integer) arguments from the stack
-% and push a single one, either 0 or 1.
-% The 'skip$ in the `and' and `or' functions are used because
-% the corresponding if$ would be idempotent
-
-FUNCTION {not}
-{   { #0 }
-    { #1 }
-  if$
-}
-
-FUNCTION {and}
-{   'skip$
-    { pop$ #0 }
-  if$
-}
-
-FUNCTION {or}
-{   { pop$ #1 }
-    'skip$
-  if$
 }
 
 % Sometimes we begin a new block only if the block will be big enough.  The
@@ -503,7 +530,7 @@ FUNCTION {paren}
 FUNCTION {quote}
 { duplicate$ empty$
     { pop$ "" }
-    { "``" swap$ * "''" * }
+    { "``" swap$ * ",''" * }
   if$
 }
 
@@ -580,15 +607,11 @@ FUNCTION {format.edited}
 
 
 % The format.title function is used for non-book-like titles.
-% For most styles we convert to lowercase (except for the very first letter,
-% and except for the first one after a colon (followed by whitespace)),
-% and hope the user has brace-surrounded words that need to stay capitilized;
-% for some styles, however, we leave it as it is in the database.
 
 FUNCTION {format.title}
 { title empty$
     { "" }
-    { title quote "t" change.case$ }
+    { title quote }
   if$
 }
 
@@ -856,13 +879,19 @@ FUNCTION {format.pages.a}
 % variations for empty fields.  This doesn't begin a sentence.
 
 FUNCTION {format.vol.num.pages}
-{ volume field.or.null embolden
-  " " swap$ * *
-  pages empty$
+{ volume empty$
     'skip$
-    { duplicate$ empty$
-        { pop$ format.pages.a }
-        { ", " * pages first.page * }
+    { 
+      "," *
+      volume field.or.null embolden
+      " " swap$ * *
+      pages empty$
+        'skip$
+        { duplicate$ empty$
+            { pop$ format.pages.a }
+            { ", " * pages first.page * }
+          if$
+        }
       if$
     }
   if$
@@ -1201,8 +1230,14 @@ FUNCTION {book}
       format.book.crossref output.nonnull
     }
   if$
-  format.edition output
-  format.date "year" output.check
+  format.edition
+  duplicate$ empty$
+    { pop$ " " *
+      before.all 'output.state :=
+    }
+    { output }
+  if$
+  format.date paren "year" output.check
   new.block
   note output
   fin.entry
@@ -1528,131 +1563,18 @@ FUNCTION {default.type} { misc }
 
 
 MACRO {jan} {"Jan."}
-
 MACRO {feb} {"Feb."}
-
 MACRO {mar} {"Mar."}
-
 MACRO {apr} {"Apr."}
-
 MACRO {may} {"May"}
-
 MACRO {jun} {"June"}
-
 MACRO {jul} {"July"}
-
 MACRO {aug} {"Aug."}
-
 MACRO {sep} {"Sept."}
-
 MACRO {oct} {"Oct."}
-
 MACRO {nov} {"Nov."}
-
 MACRO {dec} {"Dec."}
 
-
-% Journals are either written out in full or abbreviated;
-% the abbreviations are like those found in ACM publications.
-%
-% To get a completely different set of abbreviations, it may be best to make
-% a separate .bib file with nothing but those abbreviations; users could then
-% include that file name as the first argument to the \bibliography command
-
-
-MACRO {acmcs} {"ACM Comput. Surv."}
-
-MACRO {acta} {"Acta Inf."}
-
-MACRO {cacm} {"Commun. ACM"}
-
-MACRO {ibmjrd} {"IBM J. Res. Dev."}
-
-MACRO {ibmsj} {"IBM Syst.~J."}
-
-MACRO {ieeese} {"IEEE Trans. Softw. Eng."}
-
-MACRO {ieeetc} {"IEEE Trans. Comput."}
-
-MACRO {ieeetcad}
- {"IEEE Trans. Comput.-Aided Design Integrated Circuits"}
-
-MACRO {ipl} {"Inf. Process. Lett."}
-
-MACRO {jacm} {"J.~ACM"}
-
-MACRO {jcss} {"J.~Comput. Syst. Sci."}
-
-MACRO {scp} {"Sci. Comput. Programming"}
-
-MACRO {sicomp} {"SIAM J. Comput."}
-
-MACRO {tocs} {"ACM Trans. Comput. Syst."}
-
-MACRO {tods} {"ACM Trans. Database Syst."}
-
-MACRO {tog} {"ACM Trans. Gr."}
-
-MACRO {toms} {"ACM Trans. Math. Softw."}
-
-MACRO {toois} {"ACM Trans. Office Inf. Syst."}
-
-MACRO {toplas} {"ACM Trans. Prog. Lang. Syst."}
-
-MACRO {tcs} {"Theoretical Comput. Sci."}
-
-MACRO {advp} {"Adv. Phys."}
-MACRO {ajp} {"Am. J. Phys."}
-MACRO {ao} {"Appl. Opt."}
-MACRO {apl} {"Appl. Phys. Lett."}
-MACRO {apj} {"Astrophys. J."}
-MACRO {baps} {"Bull. Am. Phys. Soc."}
-MACRO {cpc} {"Computer Phys. Comm."}
-MACRO {cppcf} {"Comments Plasma Phys. Controlled Fusion"}
-MACRO {fed} {"Fusion Eng. Design"}
-MACRO {ft} {"Fusion Tech."}
-MACRO {ieeens} {"IEEE Trans. Nucl. Sci."}
-MACRO {ieeeps} {"IEEE Trans. Plasma Sci."}
-MACRO {ijimw} {"Int. J. Infrared Millimeter Waves"}
-MACRO {ip} {"Infrared Phys."}
-MACRO {jap} {"J. Appl. Phys."}
-MACRO {jcp} {"J. Comput. Phys."}
-MACRO {jetp} {"Sov. Phys.-JETP"}
-MACRO {jfe} {"J. Fusion Energy"}
-MACRO {jfm} {"J. Fluid Mech."}
-MACRO {jgr} {"J. Geophys. Res."}
-MACRO {jmp} {"J. Math. Phys."}
-MACRO {jne} {"J. Nucl. Energy"}
-MACRO {jnec} {"J. Nucl. Energy, Part C"}
-MACRO {jnm} {"J. Nucl. Mater."}
-MACRO {josa} {"J. Opt. Soc. Am."}
-MACRO {jpp} {"J. Plasma Phys."}
-MACRO {jpsj} {"J. Phys. Soc. Jpn"}
-MACRO {jvst} {"J. Vac. Sci. Technol."}
-MACRO {nedf} {"Nucl. Eng. Design/Fusion"}
-MACRO {nf} {"Nucl. Fusion"}
-MACRO {nim} {"Nucl. Instrum. Methods"}
-MACRO {nimpr} {"Nucl. Instrum. Methods Phys. Research"}
-MACRO {nse} {"Nucl. Sci. Eng."}
-MACRO {nt/f} {"Nucl. Tech./Fusion"}
-MACRO {pf} {"Phys. Fluids"}
-MACRO {pfa} {"Phys. Fluids A"}
-MACRO {pfb} {"Phys. Fluids B"}
-MACRO {pl} {"Phys. Lett."}
-MACRO {pla} {"Phys. Lett. A"}
-MACRO {pnas} {"Proc. Nat. Acad. Sci. USA"}
-MACRO {pp} {"Plasma Phys."}
-MACRO {ppcf} {"Plasma Phys. Controlled Fusion"}
-MACRO {prl} {"Phys. Rev. Lett."}
-MACRO {pr} {"Phys. Rev."}
-MACRO {pra} {"Phys. Rev. A"}
-MACRO {ps} {"Physica Scripta"}
-MACRO {rmp} {"Rev. Mod. Phys."}
-MACRO {rsi} {"Rev. Sci. Instrum."}
-MACRO {sjpp} {"Sov. J. Plasma Phys."}
-MACRO {spd} {"Sov. Phys.-Dokl."}
-MACRO {sptp} {"Sov. Phys.-Tech. Phys."}
-MACRO {spu} {"Sov. Phys.-Usp."}
 
 READ
 
