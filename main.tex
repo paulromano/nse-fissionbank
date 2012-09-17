@@ -11,8 +11,8 @@
 
 \begin{document}
 
-\noindent {\bf Title:} \\ Fission Bank Algorithms in Monte Carlo
-Criticality Calculations
+\noindent {\bf Title:} \\ Parallel Fission Bank Algorithms in Monte
+Carlo Criticality Calculations
 \vspace{12pt}
 
 \noindent {\bf Authors:} \\
@@ -32,14 +32,14 @@ Massachusetts Institute of Technology \\
 Cambridge, MA 02139
 \vspace{12pt}
 
-\noindent {\bf Number of Pages:} 38 \\
+\noindent {\bf Number of Pages:} 39 \\
 \noindent {\bf Number of Figures:} 7 \\
 \noindent {\bf Number of Tables:} 1
 
 \setcounter{page}{0}
 \thispagestyle{empty}
 
-\title{Fission Bank Algorithms in Monte Carlo Criticality Calculations}
+\title{Parallel Fission Bank Algorithms in Monte Carlo Criticality Calculations}
 \author{Paul K. Romano\footnote{Email: \texttt{romano7@mit.edu}}\\
 \em Massachusetts Institute of Technology\\
 \em Department of Nuclear Science and Engineering\\
@@ -188,7 +188,7 @@ and tally data. So for a node with eight processors, our PWR model
 will need at the bare minimum 80 GB of memory. Even without the
 addition of radial zones in each fuel pin as we have done here, one
 would still need 28 GB of memory. Indeed, Kelly {\em et al.} had to
-turned off variance calculation for nuclide-level tallies to reduce
+turn off variance calculation for nuclide-level tallies to reduce
 memory usage to a point where they could run the problem at all
 \cite{kelly}.
 
@@ -321,7 +321,7 @@ adjacent node. Thus, each compute node sends/receives only two
 messages under normal circumstances.
 
 The following example illustrates how this algorithm works. Let us
-suppose we are simulating $N = 1000$ neutrons across four compute
+suppose we are simulating $N = 1,000$ neutrons across four compute
 nodes. For this example, it is instructive to look at the state of the
 fission bank and source bank at several points in the algorithm:
 \begin{enumerate}
@@ -339,7 +339,7 @@ produces 270 fission banks sites, $p_1$ produces 230, $p_2$ produces
 290, and $p_3$ produces 250. After each node samples from its fission
 bank sites, let's assume that $p_0$ has 260 source sites, $p_1$ has
 215, $p_2$ has 280, and $p_3$ has 245. Note that the total number of
-sampled sites is 1000 as needed. For each node to have the same number
+sampled sites is 1,000 as needed. For each node to have the same number
 of source sites, $p_0$ needs to send its right-most 10 sites to $p_1$,
 and $p_2$ needs to send its left-most 25 sites to $p_1$ and its
 right-most 5 sites to $p_3$. A schematic of this example is shown in
@@ -397,7 +397,8 @@ binomial tree algorithm. In this algorithm, the root process sends the
 data to one node in the first step, and then in the subsequent, both
 the root and the other node can send the data to other nodes. Thus, it
 takes a total of $\lceil \log_2 p \rceil$ steps to complete the
-communication. The time to complete the communication is
+communication where $\lceil x \rceil$ is the smallest integer not less
+than $x$. The time to complete the communication is
 \begin{equation}
   t_{\text{short}} = \lceil \log_2 p \rceil \left ( \alpha + sN\beta
   \right ).
@@ -463,10 +464,11 @@ In a Monte Carlo criticality simulation, the power iteration method is
 applied iteratively to obtain stochastic realizations of the source
 distribution and estimates of the $k$-eigenvalue. Let us define
 $\hat{S}^{(m)}$ to be the realization of the source distribution at
-cycle $m$ and $\hat{\epsilon}^{(m)}$ be the noise arising from the
-stochastic nature of the tracking process. We can write the stochastic
-realization in terms of the fundamental source distribution and the
-noise component as \cite{brissenden}
+cycle $m$ and $\hat{\epsilon}^{(m)}$ be the deviation from the
+deterministic solution arising from the stochastic nature of the
+tracking process. We can write the stochastic realization in terms of
+the fundamental source distribution and the fluctuating component as
+\cite{brissenden}
 \begin{equation}\label{eq:source}
   \hat{S}^{(m)}(\mathbf{r})= N S(\mathbf{r}) + \sqrt{N}
   \hat{\epsilon}^{(m)}(\mathbf{r}),
@@ -493,7 +495,9 @@ distributions, respectively, as
   \hat{k} = \frac{1}{N} \int \hat{S}(\mathbf{r}) \: d\mathbf{r} \quad
   \text{and} \quad k = \int S(\mathbf{r}) \: d\mathbf{r},
 \end{equation}
-noting that $S(\mathbf{r})$ is $O(1)$. One should note that the
+noting that $S(\mathbf{r})$ is $O(1)$ since the true source
+distribution is not a function of $N$ (see Nease {\em et al.}
+\cite{nease} for a thorough discussion). One should note that the
 expected value $k$ calculated by Monte Carlo power iteration
 (\emph{i.e.} the method of successive generations) will be biased from
 the true fundamental eigenvalue of Eq. \ref{eq:NTE} by $O(1/N)$
@@ -511,10 +515,11 @@ written as
 \end{equation}
 where $\mathbf{r}_i$ is the spatial location of the $i$-th fission
 site, $w_i$ is the statistical weight of the fission site at
-$\mathbf{r}_i$, and $M$ is the total number of fission sites. It is
-clear that the total weight of the fission sites is simply the
-integral of the source distribution. Integrating Eq. \ref{eq:source}
-over all space, we obtain
+$\mathbf{r}_i$ (i.e. the weight of the neutron entering into a fission
+reaction), and $M$ is the total number of fission sites. It is clear
+that the total weight of the fission sites is simply the integral of
+the source distribution. Integrating Eq. \ref{eq:source} over all
+space, we obtain
 \begin{equation}
   \int \hat{S}(\mathbf{r}) \: d\mathbf{r} = N \int S(\mathbf{r}) \:
   d\mathbf{r} + \sqrt{N} \int \hat{\epsilon}(\mathbf{r}) \:
@@ -534,7 +539,8 @@ weight of fission sites produced, is directly proportional to the
 variance of the integral of the noise component. Let us call this term
 $\sigma^2$ for simplicity:
 \begin{equation}
-  \text{Var} \left[ \int \hat{S}(\mathbf{r}) \right ] = N \sigma^2.
+  \text{Var} \left[ \int \hat{S}(\mathbf{r}) \: d\mathbf{r} \right ] =
+  N \sigma^2.
 \end{equation}
 The actual value of $\sigma^2$ will depend on the physical nature of
 the problem, whether variance reduction techniques are employed,
@@ -633,11 +639,14 @@ $f(x)$, it can be shown that
   \sqrt{\frac{2}{\pi} \int_{-\infty}^{\infty} f(x) \left ( x - \mu
     \right )^2 \: dx}
 \end{equation}
-and thus the mean absolute deviation is $\sqrt{2/\pi}$ times the
-standard deviation. Therefore, to evaluate the mean absolute deviation
-of $M_i$, we need to first determine its variance. Substituting
-Eq. \ref{eq:average_k_as_sum} in Eq. \ref{eq:sites_per_node}, we can
-rewrite $M_i$ solely in terms of $\hat{k}_1, \dots, \hat{k}_p$:
+by substituting the probability distribution function of a normal
+distribution for $f(x)$, making a change of variables, and integrating
+both sides. Thus the mean absolute deviation is $\sqrt{2/\pi}$ times
+the standard deviation. Therefore, to evaluate the mean absolute
+deviation of $M_i$, we need to first determine its
+variance. Substituting Eq. \ref{eq:average_k_as_sum} in
+Eq. \ref{eq:sites_per_node}, we can rewrite $M_i$ solely in terms of
+$\hat{k}_1, \dots, \hat{k}_p$:
 \begin{equation}
   M_i = \frac{N \hat{k}_i}{\sum\limits_{j=1}^p \hat{k}_j}.
 \end{equation}
@@ -703,7 +712,7 @@ sound, several test cases were run to compare experimental results
 with the theoretical analysis. The algorithm described in section
 \ref{sec:algorithm} was implemented in a simple Monte Carlo code
 \cite{romano-LANL}. The number of compute nodes and histories for each
-case are shown in Table \ref{tab:cases}.  Each case was run for 10000
+case are shown in Table \ref{tab:cases}.  Each case was run for 10,000
 cycles and at the end of each run, the standard deviation of the
 number of fission bank sites sent to neighboring nodes was determined
 for each node as a proxy for the communication cost. For Case 1, the
@@ -772,27 +781,30 @@ In the limit of large $p$, this ratio becomes
 To fully appreciate what this means, we can infer values of $\sigma$
 and $k$ from the aforementioned test cases to determine what the ratio
 actually is. Recall that $\sigma$ tells us how much stochastic noise
-there is in the integrated fission source. Using $\sigma = 1.73$ and
-$k = 1$, the novel algorithm would be about 2000 times faster than the
-traditional algorithm for $N = 1000000$. Also note that as $N$
-increases, the novel algorithm will outperform the traditional
-algorithm by an even wider margin.
+there is in the integrated fission source. The sample standard
+deviation for our validation cases was $\sigma = 1.73$. Using this
+value and $k = 1$, we estimate that the novel algorithm would be about
+2,000 times faster than the traditional algorithm for $N =
+1,000,000$. Also note that as $N$ increases, the novel algorithm will
+outperform the traditional algorithm by an even wider margin.
 
 To determine the actual performance of the novel algorithm relative to
 the traditional algorithm, both algorithms were implemented in the
 aforementioned simple Monte Carlo code. A separate simulation using
 each of the algorithms was run from a single compute node up to 88
 compute nodes in parallel. In each case, the number of histories was
-40000 times the number of compute nodes so that each compute node
+40,000 times the number of compute nodes so that each compute node
 simulates the same number of histories. Each simulation was run for 20
 cycles. Figure \ref{fig:algorithm-time} shows the total time spent on
 fission bank synchronization for the traditional and novel
 algorithms. We see that the performance of the novel algorithm doesn't
 quite meet the predicted performance based on the above analysis, but
-this is not surprising given the number of simplifying assumptions made
-in the course of the analysis. Notwithstanding, the new algorithm
-performs nearly two orders of magnitude faster than the traditional
-algorithm for large $p$ and large $N$.
+this is not surprising given the number of simplifying assumptions
+made in the course of the analysis. Most importantly, we have ignored
+the time spent sampling fission sites and copying data in memory
+which may become non-negligible for large $N$. Notwithstanding, the
+new algorithm performs nearly two orders of magnitude faster than the
+traditional algorithm for large $p$ and large $N$.
 
 \section{Other Considerations}
 \label{sec:other}
@@ -907,6 +919,17 @@ of processors and instead will depend on the number of histories per
 cycle and the physical characteristics of the problem at hand. Again,
 testing using our simple Monte Carlo code confirm this prediction.
 
+The reader should keep in mind that while the algorithm presented here
+will significantly improve the time necessary to sample and distribute
+fission sites between cycles, it has no effect on the actual transport
+simulation of particles moving through a geometry. Thus, it will not
+improve smaller simulations that would typically run on a
+workstation. However, for large simulations that necessitate the use
+of a large cluster or supercomputer to complete in a reasonable amount
+of time, this novel algorithm will improve the parallel efficiency and
+is an important step in achieving scalability up to thousands of
+processors.
+
 Potential shortcomings of the present algorithm include the inability
 to provide load balancing using existing algorithms for heterogeneous
 computer architectures. A basic method to provide load balancing in
@@ -930,10 +953,10 @@ although it has not be tested as of yet.
     \hline
     Case & Compute Nodes ($p$) & Histories ($N$) \\
     \hline
-    1 & 8 & 80000 \\
-    2 & 8 & 160000 \\
-    3 & 16 & 80000 \\
-    4 & 16 & 160000 \\
+    1 & 8 & 80,000 \\
+    2 & 8 & 160,000 \\
+    3 & 16 & 80,000 \\
+    4 & 16 & 160,000 \\
     \hline
   \end{tabular}
 \end{table}
