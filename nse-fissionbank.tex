@@ -406,7 +406,7 @@ than $x$. The time to complete the communication is
 This algorithm works well for short messages since the latency term
 scales logarithmically with the number of nodes. However, for long
 messages, an algorithm that has lower bandwidth has been proposed by
-Van de Geijn \cite{vandegeijn} and implemented in MPICH2. Rather than
+Barnett et al. \cite{barnett} and implemented in MPICH2. Rather than
 using a binomial tree, the \emph{broadcast} is divided into a
 \emph{scatter} and an \emph{allgather}. The time to complete the
 \emph{scatter} is $ \log_2 p \: \alpha + \frac{p-1}{p} N\beta$ using a
