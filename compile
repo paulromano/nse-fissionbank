@@ -1,8 +1,6 @@
 #!/bin/sh
 
-latex nse-fissionbank.tex
+pdflatex nse-fissionbank.tex
 bibtex nse-fissionbank.aux
-latex nse-fissionbank.tex
-latex nse-fissionbank.tex
-dvips -Ppdf nse-fissionbank.dvi
-ps2pdf nse-fissionbank.ps nse-fissionbank.pdf
+pdflatex nse-fissionbank.tex
+pdflatex nse-fissionbank.tex

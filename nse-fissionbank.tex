@@ -1,5 +1,10 @@
 \documentclass[11pt]{article}
-\usepackage{hyperref}
+\usepackage[breaklinks=true]{hyperref}
+\hypersetup{colorlinks=true,
+  pdftitle={Parallel Fission Bank Algorithms in Monte Carlo Criticality
+    Calculations},
+  pdfauthor={Paul K. Romano and Benoit Forget}
+}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{setspace}
@@ -964,7 +969,7 @@ although it has not be tested as of yet.
 \clearpage
 \begin{figure}[p]
   \centering
-  \includegraphics[width=0.9\textwidth]{master-slave.eps}
+  \includegraphics[width=0.9\textwidth]{master-slave.pdf}
   \caption{Typical master-slave algorithm.}
   \label{fig:master-slave}
 \end{figure}
@@ -972,7 +977,7 @@ although it has not be tested as of yet.
 \clearpage
 \begin{figure}[p]
   \centering
-  \includegraphics[width=0.9\textwidth]{slave-only.eps}
+  \includegraphics[width=0.9\textwidth]{slave-only.pdf}
   \caption{Desired communication topology with no master process.}
   \label{fig:slave-only}
 \end{figure}
@@ -980,7 +985,7 @@ although it has not be tested as of yet.
 \clearpage
 \begin{figure}[p]
   \centering
-  \includegraphics[width=0.9\textwidth]{algorithm-new.eps}
+  \includegraphics[width=0.9\textwidth]{algorithm-new.pdf}
   \caption{Example scenario illustrating new fission bank algorithm.}
   \label{fig:algorithm-new}
 \end{figure}
@@ -988,7 +993,7 @@ although it has not be tested as of yet.
 \clearpage
 \begin{figure}[p]
   \centering
-  \includegraphics[width=0.75\textwidth]{plot8.eps}
+  \includegraphics[width=0.75\textwidth]{plot8.pdf}
   \caption{Expected number of fission bank sites sent to neighboring
     nodes using 8 compute nodes}
   \label{fig:mean-deviance8}
@@ -997,7 +1002,7 @@ although it has not be tested as of yet.
 \clearpage
 \begin{figure}[p]
   \centering
-  \includegraphics[width=0.75\textwidth]{plot16.eps}
+  \includegraphics[width=0.75\textwidth]{plot16.pdf}
   \caption{Expected number of fission bank sites sent to neighboring
     nodes using 16 compute nodes}
   \label{fig:mean-deviance16}
@@ -1006,7 +1011,7 @@ although it has not be tested as of yet.
 \clearpage
 \begin{figure}[p]
   \centering
-  \includegraphics[width=0.75\textwidth,angle=-90]{QQplot.eps}
+  \includegraphics[width=0.75\textwidth,angle=-90]{QQplot.pdf}
   \caption{Q-Q plot of $M_1$ for Case 1}
   \label{fig:QQ-plot}
 \end{figure}
@@ -1014,7 +1019,7 @@ although it has not be tested as of yet.
 \clearpage
 \begin{figure}[p]
   \centering
-  \includegraphics[width=0.75\textwidth]{time.eps}
+  \includegraphics[width=0.75\textwidth]{time.pdf}
   \caption{Execution time for fission bank algorithms}
   \label{fig:algorithm-time}
 \end{figure}
