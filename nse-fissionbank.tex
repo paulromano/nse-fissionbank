@@ -149,12 +149,12 @@ array. As a simplification, no control rods are modeled and thus all
 289 pins in an assembly are fuel. In Kelly {\em et al.}'s analysis of
 the Hoogenboom-Martin benchmark problem using the MC21 Monte Carlo
 code, 100 evenly spaced axial nodes were used over the 400 cm length
-of each fuel pin \cite{kelly}. Thus, one would need 6,964,900
+of each fuel pin \cite{kelly}. Thus, one would need $6\,964\,900$
 different materials in order to deplete each fuel region
 individually. If we go one step further and subdivide each axial node
 radially to resolve the difference in flux due to spatial
 self-shielding, this would add proportionally many tally regions and
-materials. With three radial zones, we would then need 20,894,700
+materials. With three radial zones, we would then need $20\,894\,700$
 materials. To obtain good statistics would require many more histories
 than fuel regions, implying that we need to use hundreds of millions
 or possibly billions of particles.
@@ -176,7 +176,7 @@ considering the parallel efficiency.
 
 The second problem is that the problem data itself may not fit on a
 single compute node. Let us again consider our PWR problem where we
-have 20,894,700 fuel regions. For each fuel region, we will have
+have $20\,894\,700$ fuel regions. For each fuel region, we will have
 associated geometry, material, and tally data. In each material, let
 us also suppose we want to track 20 isotopes. For each isotope, we
 need to know its ZAID (4-byte integer), its cross section identifier
@@ -263,11 +263,11 @@ still considerable.
 
 To see why this is the case, it is instructive to look at a
 hypothetical example. Suppose that a calculation is run with $N =
-10,000,000$ neutrons across 64 compute nodes. On average, $M =
-10,000,000$ fission sites will be produced. If the data for each
+10\,000\,000$ neutrons across 64 compute nodes. On average, $M =
+10\,000\,000$ fission sites will be produced. If the data for each
 fission site consists of a spatial location (three 8 byte real
 numbers) and a unique identifier (one 4 byte integer), the memory
-required per site is 28 bytes. To \emph{broadcast} 10,000,000 source
+required per site is 28 bytes. To \emph{broadcast} $10\,000\,000$ source
 sites to 64 nodes will thus require transferring 17.92 GB of data.
 Since each compute node does not need to keep every source site in
 memory, one could modify the algorithm from a \emph{broadcast} to a
@@ -331,7 +331,7 @@ adjacent node. Thus, each compute node sends/receives only two
 messages under normal circumstances.
 
 The following example illustrates how this algorithm works. Let us
-suppose we are simulating $N = 1,000$ neutrons across four compute
+suppose we are simulating $N = 1000$ neutrons across four compute
 nodes. For this example, it is instructive to look at the state of the
 fission bank and source bank at several points in the algorithm:
 \begin{enumerate}
@@ -349,7 +349,7 @@ produces 270 fission banks sites, $p_1$ produces 230, $p_2$ produces
 290, and $p_3$ produces 250. After each node samples from its fission
 bank sites, let's assume that $p_0$ has 260 source sites, $p_1$ has
 215, $p_2$ has 280, and $p_3$ has 245. Note that the total number of
-sampled sites is 1,000 as needed. For each node to have the same number
+sampled sites is 1000 as needed. For each node to have the same number
 of source sites, $p_0$ needs to send its right-most 10 sites to $p_1$,
 and $p_2$ needs to send its left-most 25 sites to $p_1$ and its
 right-most 5 sites to $p_3$. A schematic of this example is shown in
@@ -722,7 +722,7 @@ sound, several test cases were run to compare experimental results
 with the theoretical analysis. The algorithm described in section
 \ref{sec:algorithm} was implemented in a simple Monte Carlo code
 \cite{romano-LANL}. The number of compute nodes and histories for each
-case are shown in Table \ref{tab:cases}.  Each case was run for 10,000
+case are shown in Table \ref{tab:cases}.  Each case was run for $10\,000$
 cycles and at the end of each run, the standard deviation of the
 number of fission bank sites sent to neighboring nodes was determined
 for each node as a proxy for the communication cost. For Case 1, the
@@ -794,8 +794,8 @@ actually is. Recall that $\sigma$ tells us how much stochastic noise
 there is in the integrated fission source. The sample standard
 deviation for our validation cases was $\sigma = 1.73$. Using this
 value and $k = 1$, we estimate that the novel algorithm would be about
-2,000 times faster than the traditional algorithm for $N =
-1,000,000$. Also note that as $N$ increases, the novel algorithm will
+2000 times faster than the traditional algorithm for $N =
+1\,000\,000$. Also note that as $N$ increases, the novel algorithm will
 outperform the traditional algorithm by an even wider margin.
 
 To determine the actual performance of the novel algorithm relative to
@@ -803,7 +803,7 @@ the traditional algorithm, both algorithms were implemented in the
 aforementioned simple Monte Carlo code. A separate simulation using
 each of the algorithms was run from a single compute node up to 88
 compute nodes in parallel. In each case, the number of histories was
-40,000 times the number of compute nodes so that each compute node
+$40\,000$ times the number of compute nodes so that each compute node
 simulates the same number of histories. Each simulation was run for 20
 cycles. Figure \ref{fig:algorithm-time} shows the total time spent on
 fission bank synchronization for the traditional and novel
@@ -963,10 +963,10 @@ although it has not be tested as of yet.
     \hline
     Case & Compute Nodes ($p$) & Histories ($N$) \\
     \hline
-    1 & 8 & 80,000 \\
-    2 & 8 & 160,000 \\
-    3 & 16 & 80,000 \\
-    4 & 16 & 160,000 \\
+    1 & 8 & $80\,000$ \\
+    2 & 8 & $160\,000$ \\
+    3 & 16 & $80\,000$ \\
+    4 & 16 & $160\,000$ \\
     \hline
   \end{tabular}
 \end{table}
